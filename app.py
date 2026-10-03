@@ -33,7 +33,6 @@ st.divider()
 st.sidebar.header("⚙️ Simulation Parameters")
 
 st.sidebar.subheader("Mesh Density")
-# Tweak the min/max values based on what your solver can handle comfortably in a few seconds
 num_r = st.sidebar.slider("Radial Divisions", min_value=10, max_value=60, value=40)
 num_theta = st.sidebar.slider("Angular Divisions", min_value=45, max_value=240, value=180)
 
@@ -116,16 +115,29 @@ if run_button:
     y = mesh.coords[:, 1]
     z = T.flatten()
     
-    # Create the 3D surface using the exact finite element triangulation
+    # Build explicit triangle lists to safely support both T3 and Q4 elements
+    tri_i, tri_j, tri_k = [], [], []
+    
+    for elem, e_type in zip(mesh.elements, mesh.element_types):
+        if e_type == "T3":
+            tri_i.append(elem[0])
+            tri_j.append(elem[1])
+            tri_k.append(elem[2])
+        elif e_type == "Q4":
+            # Split quad into two triangles: (0, 1, 2) and (0, 2, 3)
+            tri_i.extend([elem[0], elem[0]])
+            tri_j.extend([elem[1], elem[2]])
+            tri_k.extend([elem[2], elem[3]])
+
+    # Create the 3D surface using the safe triangle lists
     fig = go.Figure(data=[go.Mesh3d(
         x=x, y=y, z=z, 
         intensity=z, 
         colorscale='Inferno',
         colorbar_title="Temp (°C)",
-        # Extract the node indices for the triangles (i, j, k)
-        i=mesh.elements[:, 0], 
-        j=mesh.elements[:, 1], 
-        k=mesh.elements[:, 2],
+        i=tri_i, 
+        j=tri_j, 
+        k=tri_k,
         showscale=True
     )])
     
