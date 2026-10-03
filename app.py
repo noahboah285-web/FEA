@@ -19,7 +19,7 @@ from main import generate_sample_mesh
 st.set_page_config(page_title="FEM Heat Transfer Solver", page_icon="🔥", layout="wide")
 
 # --- UI: Header & Resume Highlights ---
-st.title("🔥 2D/3D FEM Heat Transfer Solver")
+st.title("2D/3D FEM Heat Transfer Solver")
 st.markdown("""
 **Project Highlights:**
 * Engineered a 1D/2D FEM heat-transfer solver supporting 10,000+ nodes and 9,800+ elements.
@@ -30,7 +30,7 @@ st.markdown("""
 st.divider()
 
 # --- UI: Sidebar Parameters ---
-st.sidebar.header("⚙️ Simulation Parameters")
+st.sidebar.header("Simulation Parameters")
 
 st.sidebar.subheader("Mesh Density")
 num_r = st.sidebar.slider("Radial Divisions", min_value=10, max_value=60, value=40)
@@ -171,4 +171,4 @@ if run_button:
                 mime="application/octet-stream"
             )
 else:
-    st.info("👈 Adjust the parameters in the sidebar and click **Run Simulation** to begin.")
+    st.info("Adjust the parameters in the sidebar and click **Run Simulation** to begin.")
