@@ -61,7 +61,6 @@ if run_button:
         mesh.coords = coords
         mesh.elements = elements
         mesh.element_types = element_types
-        mesh.num_nodes = len(coords)
         mesh.num_elements = len(elements)
         
         # 3. Compute Element Matrices
