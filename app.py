@@ -57,7 +57,7 @@ if run_button:
         coords, elements, element_types = generate_sample_mesh(num_r=num_r, num_theta=num_theta)
         
         # 2. Create Mesh object directly in memory
-        mesh = Mesh()
+        mesh = Mesh.generate_structured(nx=10, ny=10, lx=1.0, ly=1.0)
         mesh.coords = coords
         mesh.elements = elements
         mesh.element_types = element_types
