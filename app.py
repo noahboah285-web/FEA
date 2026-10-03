@@ -142,12 +142,14 @@ if run_button:
     )])
     
     # Configure the 3D scene aesthetics
+# Configure the 3D scene aesthetics with custom width/length scaling
     fig.update_layout(
         scene=dict(
             xaxis_title='X (m)', 
             yaxis_title='Y (m)', 
             zaxis_title='Temperature (°C)',
-            aspectmode='data' # Ensures the physical dimensions aren't distorted
+            aspectmode='manual',
+            aspectratio=dict(x=1.5, y=1.5, z=0.8)  # Stretches out X and Y, compresses Z slightly for a balanced look
         ),
         margin=dict(l=0, r=0, b=0, t=0),
         height=700
