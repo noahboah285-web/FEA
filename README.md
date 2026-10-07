@@ -8,9 +8,9 @@ An end-to-end 2D Steady-State Thermal Finite Element Analysis (FEA) solver engin
 
 ---
 
-## 🏗️ Project Overview
+## Project Overview
 
-This application solves 2D steady-state heat conduction across complex geometries with stress risers and cutouts (such as plates with circular holes). Supporting meshes up to **10,000+ nodes** and **19,000+ elements**, the solver manages the complete scientific computing pipeline:
+This application solves 2D steady-state heat conduction across complex geometries with stress risers and cutouts (such as plates with circular holes). Supporting meshes up to 10,000+ nodes and 19,000+ elements, the solver manages the complete scientific computing pipeline:
 
 1. **Mesh Import & Generation:** Reads unstructured geometries via `meshio` and generates high-density Delaunay grids.
 2. **Element Formulation:** Computes local stiffness matrices ($K^e$) for Constant Strain Triangles (T3) and Isoparametric Quadrilaterals (Q4).
@@ -20,7 +20,7 @@ This application solves 2D steady-state heat conduction across complex geometrie
 
 ---
 
-## ✨ Key Features & Technical Highlights
+## Key Features & Technical Highlights
 
 * **Dual-Element Compatibility (T3 & Q4):** Supports both 3-node triangular (T3) and 4-node quadrilateral (Q4) isoparametric element formulations.
 * **Scalable Sparse Matrix Architecture:** Converts COO sparse matrices to CSR format prior to linear system solving, maintaining fast execution times even at high node counts.
@@ -29,7 +29,7 @@ This application solves 2D steady-state heat conduction across complex geometrie
 
 ---
 
-## 📈 Performance & Convergence Metrics
+## Performance & Convergence Metrics
 
 The solver was verified against the 2D analytical Laplace heat equation:
 $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(\pi y / L)}{\sinh(\pi)}$$
@@ -42,11 +42,11 @@ $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(
 | **4,900** | 9,522 | ~0.0570s | ~0.0165s | 0.31% |
 | **10,000** | 19,602 | ~0.1210s | ~0.0380s | **0.15%** |
 
-> **Validation Note:** The solver achieves monotonic $h$-refinement convergence, bringing relative $L_2$ error down to **0.15%** at $N \approx 10,000$ nodes while keeping combined assembly and solve execution times under **0.2 seconds**.
+> **Validation Note:** The solver achieves monotonic $h$-refinement convergence, bringing relative $L_2$ error down to **0.15%** at $N \approx 10,000$ nodes while keeping combined assembly and solve execution times under 0.2 seconds.
 
 ---
 
-## 📐 Mathematical Formulation
+## Mathematical Formulation
 
 ### 1. Primary Field Equation
 Steady-state heat conduction governed by the 2D Laplace equation:
@@ -66,7 +66,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 
 ---
 
-## ⚠️ Assumptions & Solver Limitations
+## Assumptions & Solver Limitations
 
 ### 1. Physical & Material Assumptions
 * **Steady-State Thermal Behavior:** Assumes steady-state heat conduction ($\frac{\partial T}{\partial t} = 0$). Thermal mass, heat capacity ($c_p$), density ($\rho$), and transient temperature response are omitted.
@@ -89,7 +89,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 
 ---
 
-## 📁 Repository Architecture
+## Repository Architecture
 
 ```text
 fea-thermal-solver/
