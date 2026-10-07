@@ -75,7 +75,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 
 ### 1. Physical & Material Assumptions
 * **Steady-State Thermal Behavior:** Assumes steady-state heat conduction ($\frac{\partial T}{\partial t} = 0$). Thermal mass, heat capacity ($c_p$), density ($\rho$), and transient temperature response are omitted.
-* **Isotropic/Orthotropic Material Properties:** Thermal conductivity coefficients ($k_x$, $k_y$) are assumed constant per element and temperature-independent ($k \neq f(T)$).
+* **Isotropic/Orthotropic Material Properties:** Thermal conductivity coefficients ($k_x$, $k_y$) are assumed constant per element and temperature-independent.
 * **No Internal Heat Generation ($Q = 0$):** Primary unstructured domain solves pure conduction without volumetric internal heat sources or sinks ($Q(x,y) = 0$).
 * **2D Planar Geometry:** Formulated for thin 2D plates operating under plane heat conduction with uniform unit thickness ($t = 1.0$).
 
