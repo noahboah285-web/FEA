@@ -62,7 +62,10 @@ $$D = \begin{bmatrix} k_x & 0 \cr 0 & k_y \end{bmatrix}$$
 ### 3. Boundary Conditions & Heat Flux Post-Processing
 * **Dirichlet BCs:** Prescribed nodal temperatures applied directly via identity row modification in the sparse global system.
 * **Heat Flux Vector Field:** Computed via Fourier's Law at element centroids:
-$$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \cr k_y \frac{\partial T}{\partial y} \end{bmatrix}$$
+
+$$
+\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \cr k_y \frac{\partial T}{\partial y} \end{bmatrix}
+$$
 
 ---
 
