@@ -32,6 +32,7 @@ This application solves 2D steady-state heat conduction across complex geometrie
 ## Performance & Convergence Metrics
 
 The solver was verified against the 2D analytical Laplace heat equation:
+
 $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(\pi y / L)}{\sinh(\pi)}$$
 
 | Node Count ($N$) | Element Count | Matrix Assembly (s) | Linear System Solve (s) | Relative $L_2$ Error (%) |
@@ -50,22 +51,23 @@ $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(
 
 ### 1. Primary Field Equation
 Steady-state heat conduction governed by the 2D Laplace equation:
+
 $$-\nabla \cdot (k \nabla T) = Q$$
 
 ### 2. Element Stiffness Matrix Assembly
 For isotropic thermal conductivity ($k_x$, $k_y$), the local element stiffness matrix $K^e$ is integrated as:
+
 $$K^e = \int_{\Omega^e} B^T D B \, d\Omega$$
 
 where $B$ is the strain-displacement matrix containing shape function derivatives ($\frac{\partial N_i}{\partial x}$ and $\frac{\partial N_i}{\partial y}$), and $D$ is the conductivity tensor:
-$$D = \begin{bmatrix} k_x & 0 \cr 0 & k_y \end{bmatrix}$$
+
+$$D = \begin{bmatrix} k_x & 0 \\ 0 & k_y \end{bmatrix}$$
 
 ### 3. Boundary Conditions & Heat Flux Post-Processing
 * **Dirichlet BCs:** Prescribed nodal temperatures applied directly via identity row modification in the sparse global system.
 * **Heat Flux Vector Field:** Computed via Fourier's Law at element centroids:
 
-$$
-\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \cr k_y \frac{\partial T}{\partial y} \end{bmatrix}
-$$
+$$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ k_y \frac{\partial T}{\partial y} \end{bmatrix}$$
 
 ---
 
