@@ -29,7 +29,7 @@ This application solves 2D steady-state heat conduction across complex geometrie
 
 ---
 
-## 📈 Performance & Convergence Metrics
+##Performance & Convergence Metrics
 
 The solver was verified against the 2D analytical Laplace heat equation:
 $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(\pi y / L)}{\sinh(\pi)}$$
@@ -46,7 +46,7 @@ $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(
 
 ---
 
-## 📐 Mathematical Formulation
+##Mathematical Formulation
 
 ### 1. Primary Field Equation
 Steady-state heat conduction governed by the 2D Laplace equation:
@@ -64,7 +64,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 
 ---
 
-## ⚠️ Assumptions & Solver Limitations
+##Assumptions & Solver Limitations
 
 ### 1. Physical & Material Assumptions
 * **Steady-State Thermal Behavior:** Assumes steady-state heat conduction ($\frac{\partial T}{\partial t} = 0$). Thermal mass, heat capacity ($c_p$), density ($\rho$), and transient temperature response are omitted.
@@ -87,7 +87,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 
 ---
 
-## 📁 Repository Architecture
+##Repository Architecture
 
 ```text
 fea-thermal-solver/
