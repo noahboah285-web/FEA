@@ -6,6 +6,8 @@
 
 An end-to-end 2D Steady-State Thermal Finite Element Analysis (FEA) solver engineered in Python. The project features automated mesh generation, dual element formulation (T3/Q4), sparse global system assembly, interactive 3D thermal topography visualization, and a quantitative validation suite benchmarked against analytical Laplace solutions.
 
+Live Dashboard: https://awsbjt3xvdu2c37jyzpubn.streamlit.app/
+
 ---
 
 ## Project Overview
