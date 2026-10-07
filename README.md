@@ -8,19 +8,19 @@ An end-to-end 2D Steady-State Thermal Finite Element Analysis (FEA) solver engin
 
 ---
 
-## Project Overview
+## 🏗️ Project Overview
 
 This application solves 2D steady-state heat conduction across complex geometries with stress risers and cutouts (such as plates with circular holes). Supporting meshes up to **10,000+ nodes** and **19,000+ elements**, the solver manages the complete scientific computing pipeline:
 
 1. **Mesh Import & Generation:** Reads unstructured geometries via `meshio` and generates high-density Delaunay grids.
 2. **Element Formulation:** Computes local stiffness matrices ($K^e$) for Constant Strain Triangles (T3) and Isoparametric Quadrilaterals (Q4).
-3. **Sparse Assembly:** Assembles global linear systems using Sparse Coordinate Format (COO) for memory-efficient $O(N)$ scaling.
+3. **Sparse Assembly:** Assembles global linear systems using Sparse Coordinate Format (COO) for memory-efficient $\mathcal{O}(N)$ scaling.
 4. **Linear System Solution:** Enforces Dirichlet boundary conditions and solves $K \cdot T = F$ via Compressed Sparse Row (CSR) direct solvers (`scipy.sparse.linalg.spsolve`).
 5. **Post-Processing & Visualization:** Calculates temperature gradient vectors ($\nabla T$) and heat flux vectors ($\vec{q} = -k \nabla T$), exporting data to `.vtk` files for ParaView and rendering interactive 3D Matplotlib surface elevation plots.
 
 ---
 
-##Key Features & Technical Highlights
+## ✨ Key Features & Technical Highlights
 
 * **Dual-Element Compatibility (T3 & Q4):** Supports both 3-node triangular (T3) and 4-node quadrilateral (Q4) isoparametric element formulations.
 * **Scalable Sparse Matrix Architecture:** Converts COO sparse matrices to CSR format prior to linear system solving, maintaining fast execution times even at high node counts.
@@ -29,7 +29,7 @@ This application solves 2D steady-state heat conduction across complex geometrie
 
 ---
 
-##Performance & Convergence Metrics
+## 📈 Performance & Convergence Metrics
 
 The solver was verified against the 2D analytical Laplace heat equation:
 $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(\pi y / L)}{\sinh(\pi)}$$
@@ -46,7 +46,7 @@ $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(
 
 ---
 
-##Mathematical Formulation
+## 📐 Mathematical Formulation
 
 ### 1. Primary Field Equation
 Steady-state heat conduction governed by the 2D Laplace equation:
@@ -55,7 +55,9 @@ $$-\nabla \cdot (k \nabla T) = Q$$
 ### 2. Element Stiffness Matrix Assembly
 For isotropic thermal conductivity ($k_x, k_y$), the local element stiffness matrix $K^e$ is integrated as:
 $$K^e = \int_{\Omega^e} B^T D B \, d\Omega$$
-where $B$ is the strain-displacement matrix containing shape function derivatives ($\frac{\partial N_i}{\partial x}, \frac{\partial N_i}{\partial y}$), and $D = \begin{bmatrix} k_x & 0 \\ 0 & k_y \end{bmatrix}$.
+
+where $B$ is the strain-displacement matrix containing shape function derivatives ($\frac{\partial N_i}{\partial x}, \frac{\partial N_i}{\partial y}$), and $D$ is the conductivity tensor:
+$$D = \begin{bmatrix} k_x & 0 \\ 0 & k_y \end{bmatrix}$$
 
 ### 3. Boundary Conditions & Heat Flux Post-Processing
 * **Dirichlet BCs:** Prescribed nodal temperatures applied directly via identity row modification in the sparse global system.
@@ -64,7 +66,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 
 ---
 
-##Assumptions & Solver Limitations
+## ⚠️ Assumptions & Solver Limitations
 
 ### 1. Physical & Material Assumptions
 * **Steady-State Thermal Behavior:** Assumes steady-state heat conduction ($\frac{\partial T}{\partial t} = 0$). Thermal mass, heat capacity ($c_p$), density ($\rho$), and transient temperature response are omitted.
@@ -82,12 +84,12 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 * **Flux Accuracy:** Nodal temperature values ($T$) converge at $\mathcal{O}(h^2)$, while post-processed derivative fields ($\vec{q} = -k \nabla T$) converge at $\mathcal{O}(h)$ due to numerical differentiation.
 
 ### 4. Computational & Scaling Limits
-* **In-Core Sparse Solver:** Direct matrix factorization (`scipy.sparse.linalg.spsolve`) uses $O(N^{1.5})$ memory in 2D, which is highly efficient for up to $\sim 10^5$ degrees of freedom but requires iterative solvers (e.g., Preconditioned Conjugate Gradient) for $10^6+$ node grids.
+* **In-Core Sparse Solver:** Direct matrix factorization (`scipy.sparse.linalg.spsolve`) uses $\mathcal{O}(N^{1.5})$ memory in 2D, which is highly efficient for up to $\sim 10^5$ degrees of freedom but requires iterative solvers (e.g., Preconditioned Conjugate Gradient) for $10^6+$ node grids.
 * **Single-Threaded Execution:** Matrix assembly and linear system operations execute sequentially without multi-threading (OpenMP/MPI) or GPU acceleration.
 
 ---
 
-##Repository Architecture
+## 📁 Repository Architecture
 
 ```text
 fea-thermal-solver/
