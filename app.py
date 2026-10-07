@@ -12,12 +12,12 @@ from src.boundary_conditions import apply_dirichlet_bcs
 from src.solver import solve_system
 from src.postprocess import compute_flux_fields, export_to_vtk
 
-# Import the in-memory mesh generator
+# Import in-memory mesh generator
 from main import generate_sample_mesh 
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="FEM Heat Transfer Solver",
+    page_title="2D/3D FEM Thermal Solver",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -26,40 +26,39 @@ st.set_page_config(
 def inject_custom_css():
     st.markdown("""
     <style>
-        /* Hide default Streamlit visual clutter */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         .block-container {
-            padding-top: 1.5rem;
+            padding-top: 1.2rem;
             padding-bottom: 2rem;
         }
 
-        /* Metric Cards Styling */
+        /* Metric Box Styling */
         [data-testid="stMetric"] {
             background-color: #1E293B;
             border: 1px solid #334155;
-            padding: 16px 20px;
+            padding: 12px 16px;
             border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         [data-testid="stMetricLabel"] {
             color: #94A3B8 !important;
+            font-size: 0.8rem;
             font-weight: 500;
-            font-size: 0.875rem;
         }
         [data-testid="stMetricValue"] {
             color: #38BDF8 !important;
             font-family: 'JetBrains Mono', monospace, sans-serif;
+            font-size: 1.4rem;
             font-weight: 700;
         }
 
-        /* Sidebar Container Refinement */
+        /* Sidebar Styling */
         [data-testid="stSidebar"] {
             background-color: #0F172A;
             border-right: 1px solid #1E293B;
         }
 
-        /* Primary Action Button Styling */
+        /* Primary Button */
         div.stButton > button {
             background-color: #0284C7;
             color: #FFFFFF;
@@ -67,63 +66,42 @@ def inject_custom_css():
             font-weight: 600;
             border: none;
             padding: 0.5rem 1rem;
-            transition: all 0.2s ease-in-out;
         }
         div.stButton > button:hover {
             background-color: #0369A1;
-            border: none;
             color: #FFFFFF;
         }
 
-        /* Secondary / Download Button Styling */
+        /* Secondary Download Button */
         div.stDownloadButton > button {
             background-color: #1E293B;
             color: #F8FAFC;
             border: 1px solid #334155;
             border-radius: 6px;
             font-weight: 600;
-            transition: all 0.2s ease-in-out;
         }
         div.stDownloadButton > button:hover {
             background-color: #334155;
             color: #FFFFFF;
-            border-color: #475569;
-        }
-
-        /* Tab Navigation Bar */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
-        }
-        .stTabs [data-baseweb="tab"] {
-            background-color: #1E293B;
-            border-radius: 6px 6px 0px 0px;
-            padding: 8px 18px;
-            border: 1px solid #334155;
-            color: #94A3B8;
-        }
-        .stTabs [aria-selected="true"] {
-            background-color: #0284C7 !important;
-            color: #FFFFFF !important;
-            border-color: #0284C7 !important;
         }
     </style>
     """, unsafe_allow_html=True)
 
 inject_custom_css()
 
-# --- UI: Header & Resume Highlights ---
+# --- Top Header & Collapsible Overview ---
 st.title("2D/3D FEM Heat Transfer Solver")
-st.markdown("""
-**Project Highlights:**
-* Engineered a 1D/2D FEM heat-transfer solver supporting 10,000+ nodes and 9,800+ elements.
-* Achieved < 1.5% error versus analytical solutions across validation cases.
-* Improved computational efficiency by 12x using sparse matrix storage (CSR).
-* Implemented Dirichlet boundary conditions based on spatial coordinates.
-""")
-st.divider()
 
-# --- UI: Sidebar Parameters ---
-st.sidebar.header("Simulation Parameters")
+with st.expander("Project Overview & Highlights", expanded=False):
+    st.markdown("""
+    * **High-Density Domain Support:** Formulated for 10,000+ nodes and 9,800+ hybrid T3/Q4 elements.
+    * **Verification:** Validated against analytical Laplace solutions with < 1.5% L2 relative error.
+    * **Performance:** Accelerated system assembly and direct solve times using SciPy Compressed Sparse Row (CSR) storage.
+    * **Boundary Conditions:** Spatial coordinate-based Dirichlet boundary condition enforcement.
+    """)
+
+# --- Sidebar Inputs ---
+st.sidebar.header("Simulation Control Panel")
 
 st.sidebar.subheader("Mesh Density")
 num_r = st.sidebar.slider("Radial Divisions", min_value=10, max_value=60, value=40)
@@ -141,20 +119,18 @@ run_button = st.sidebar.button("Run Simulation", use_container_width=True)
 
 # --- Execution Logic ---
 if run_button:
-    with st.spinner("Generating mesh, assembling matrices, and solving system..."):
-        
+    with st.spinner("Executing finite element solver pipeline..."):
         start_time = time.perf_counter()
         
-        # 1. Generate In-Memory Geometry
+        # 1. Mesh Generation
         coords, elements, element_types = generate_sample_mesh(num_r=num_r, num_theta=num_theta)
         
-        # 2. Create Mesh object directly in memory
         mesh = Mesh.generate_structured(nx=10, ny=10, lx=1.0, ly=1.0)
         mesh.coords = coords
         mesh.elements = elements
         mesh.element_types = element_types
         
-        # 3. Compute Element Matrices
+        # 2. Element Matrices
         k_elem_dict = {}
         for elem_id in range(mesh.num_elements):
             elem_coords = mesh.coords[mesh.elements[elem_id]]
@@ -164,10 +140,10 @@ if run_button:
             elif e_type == "Q4":
                 k_elem_dict[elem_id] = Q4Element.compute_ke(elem_coords, kx, ky)
                 
-        # 4. Assemble Global System
+        # 3. Global Assembly
         K_global, F_global = assemble_global_system(mesh, k_elem_dict)
         
-        # 5. Apply Boundary Conditions
+        # 4. Apply Boundary Conditions
         left_nodes = np.where(np.isclose(mesh.coords[:, 0], -1.0))[0]
         right_nodes = np.where(np.isclose(mesh.coords[:, 0], 1.0))[0]
         
@@ -176,66 +152,57 @@ if run_button:
         
         K_bc, F_bc = apply_dirichlet_bcs(K_global, F_global, dirichlet_bcs)
         
-        # 6. Solve Linear System
+        # 5. Solve System
         T = solve_system(K_bc, F_bc)
         
-        # 7. Compute Flux
+        # 6. Post-Processing
         centroids, grad_T, q = compute_flux_fields(mesh, T, kx, ky)
         q_magnitude = np.linalg.norm(q, axis=1)
         
-        # 8. Generate VTK File for Download
+        # 7. File Export
         vtk_filename = "solution.vtk"
         export_to_vtk(vtk_filename, mesh, T, q)
         
         end_time = time.perf_counter()
+        solve_duration = end_time - start_time
 
-    # --- UI: Display Results ---
-    st.success(f"Simulation completed successfully in {end_time - start_time:.3f} seconds!")
-    
-    # KPI Metrics Bar
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Nodes", f"{mesh.num_nodes:,}")
-    col2.metric("Total Elements", f"{mesh.num_elements:,}")
-    col3.metric("Max Temperature", f"{T.max():.2f} C")
-    col4.metric("Max Heat Flux", f"{q_magnitude.max():.2f} W/m2")
-    
+    # --- KPI Metrics Banner ---
+    m1, m2, m3, m4, m5 = st.columns(5)
+    m1.metric("Nodes", f"{mesh.num_nodes:,}")
+    m2.metric("Elements", f"{mesh.num_elements:,}")
+    m3.metric("Max Temp", f"{T.max():.2f} C")
+    m4.metric("Max Heat Flux", f"{q_magnitude.max():.2f} W/m2")
+    m5.metric("Compute Time", f"{solve_duration:.3f} s")
+
     st.divider()
 
-    # Organized Output Tabs
-    tab_vis, tab_export = st.tabs(["3D Temperature Field", "Data Export & Analysis"])
+    # --- Split View Layout (70% Plot / 30% Analytics) ---
+    plot_col, analytics_col = st.columns([7, 3])
 
-    with tab_vis:
-        st.subheader("Interactive Temperature Distribution")
-        st.caption("Drag to rotate, scroll to zoom. Hover over the surface to inspect nodal temperatures.")
+    with plot_col:
+        st.subheader("Interactive Thermal Topography")
         
-        # Prepare coordinates for 3D Mesh Plotting
         x = mesh.coords[:, 0]
         y = mesh.coords[:, 1]
         z = T.flatten()
         
-        # Build triangle indices supporting T3 and Q4 elements
         tri_i, tri_j, tri_k = [], [], []
-        
         for elem, e_type in zip(mesh.elements, mesh.element_types):
             if e_type == "T3":
                 tri_i.append(elem[0])
                 tri_j.append(elem[1])
                 tri_k.append(elem[2])
             elif e_type == "Q4":
-                # Split quad into two triangles: (0, 1, 2) and (0, 2, 3)
                 tri_i.extend([elem[0], elem[0]])
                 tri_j.extend([elem[1], elem[2]])
                 tri_k.extend([elem[2], elem[3]])
 
-        # 3D Mesh Surface Plot
         fig = go.Figure(data=[go.Mesh3d(
             x=x, y=y, z=z, 
             intensity=z, 
             colorscale='Inferno',
             colorbar_title="Temp (C)",
-            i=tri_i, 
-            j=tri_j, 
-            k=tri_k,
+            i=tri_i, j=tri_j, k=tri_k,
             showscale=True
         )])
         
@@ -245,25 +212,41 @@ if run_button:
                 yaxis_title='Y (m)', 
                 zaxis_title='Temperature (C)',
                 aspectmode='manual',
-                aspectratio=dict(x=1.5, y=1.5, z=0.8)
+                aspectratio=dict(x=1.4, y=1.4, z=0.7)
             ),
             margin=dict(l=0, r=0, b=0, t=0),
-            height=700
+            height=620
         )
         
         st.plotly_chart(fig, use_container_width=True)
 
-    with tab_export:
-        st.subheader("Raw Data Export")
-        st.write("Download the computed temperature and heat flux fields for local analysis in ParaView.")
+    with analytics_col:
+        st.subheader("Field Summary")
         
-        if os.path.exists(vtk_filename):
-            with open(vtk_filename, "rb") as file:
-                st.download_button(
-                    label="Download VTK File",
-                    data=file,
-                    file_name="fea_results.vtk",
-                    mime="application/octet-stream"
-                )
+        with st.container(border=True):
+            st.markdown("**Thermal Statistics**")
+            st.write(f"Minimum Temperature: `{T.min():.2f} C`")
+            st.write(f"Mean Temperature: `{T.mean():.2f} C`")
+            st.write(f"Maximum Temperature: `{T.max():.2f} C`")
+            st.write(f"Mean Heat Flux: `{q_magnitude.mean():.2f} W/m2`")
+
+        with st.container(border=True):
+            st.markdown("**Material & Domain**")
+            st.write(f"Conductivity Matrix: `kx={kx:.1f}, ky={ky:.1f}`")
+            st.write(f"Left BC: `{left_bc:.1f} C`")
+            st.write(f"Right BC: `{right_bc:.1f} C`")
+
+        with st.container(border=True):
+            st.markdown("**Data Export**")
+            st.caption("Export VTK file for post-processing in ParaView.")
+            if os.path.exists(vtk_filename):
+                with open(vtk_filename, "rb") as file:
+                    st.download_button(
+                        label="Download VTK Results",
+                        data=file,
+                        file_name="fea_results.vtk",
+                        mime="application/octet-stream",
+                        use_container_width=True
+                    )
 else:
-    st.info("Adjust the parameters in the sidebar and click Run Simulation to begin.")
+    st.info("Adjust the parameters in the sidebar and click Run Simulation to view results.")
