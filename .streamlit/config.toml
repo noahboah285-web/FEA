@@ -1,0 +1,10 @@
+[theme]
+primaryColor = "#00ADB5"                # Accent teal for buttons, sliders, and active tabs
+backgroundColor = "#0F172A"             # Slate dark background
+secondaryBackgroundColor = "#1E293B"    # Cards, sidebar, and container backgrounds
+textColor = "#F8FAFC"                  # High-contrast readable text
+font = "sans serif"
+
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"

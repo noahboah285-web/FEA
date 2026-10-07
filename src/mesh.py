@@ -8,10 +8,10 @@ class Mesh:
     Unified Mesh class supporting both structured rectangular grids (Q4)
     and unstructured dual-element meshes (T3 & Q4) imported via meshio.
     """
-    def __init__(self, coords, elements, element_types, physical_boundaries=None):
-        self.coords = np.array(coords, dtype=float)
-        self.elements = list(elements)  # List of lists to allow mixed element topologies (3-node vs 4-node)
-        self.element_types = list(element_types)  # e.g., ["T3", "T3", "Q4", ...]
+    def __init__(self, coords=None, elements=None, element_types=None, physical_boundaries=None):
+        self.coords = np.array(coords, dtype=float) if coords is not None else np.empty((0, 2))
+        self.elements = list(elements) if elements is not None else []  # List of lists to allow mixed element topologies (3-node vs 4-node)
+        self.element_types = list(element_types) if element_types is not None else []  # e.g., ["T3", "T3", "Q4", ...]
         self.physical_boundaries = physical_boundaries if physical_boundaries is not None else {}
 
     @property
