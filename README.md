@@ -74,7 +74,10 @@ $$\vec{q} = -k \nabla T = \left[\begin{array}{c} -k_x \frac{\partial T}{\partial
 * **No Internal Heat Generation ($Q = 0$):** Primary unstructured domain solves pure conduction without volumetric internal heat sources or sinks ($Q(x,y) = 0$).
 * **2D Planar Geometry:** Formulated for thin 2D plates operating under plane heat conduction with uniform unit thickness ($t = 1.0$).
 
-* **No Convection or Radiation:** Natural/forced surface convection ($q = h(T - T_{\mathrm{amb}})$) and radiative exchange ($q = \epsilon \sigma (T^4 - T_{\mathrm{amb}}^4)$) are not currently modeled.
+### 2. Boundary Condition Support
+* **Dirichlet BC Dominance:** Supports fixed nodal temperature boundary conditions ($T = T_0$).
+* **Insulated Boundary Default:** Unassigned outer boundaries default to zero heat flux ($\nabla T \cdot \mathbf{n} = 0$).
+* **No Convection or Radiation:** Natural/forced surface convection ($q = h(T - T_{\infty})$) and radiative exchange ($q = \epsilon \sigma (T^4 - T_{\infty}^4)$) are not currently modeled.
 
 ### 3. Numerical & Mathematical Formulations
 * **Linear Shape Functions (T3/Q4):** Constant Strain Triangles (T3) yield piecewise constant temperature gradients ($\nabla T$) and heat flux vectors ($\vec{q}$) within each element, causing step discontinuities across element edges prior to nodal averaging.
