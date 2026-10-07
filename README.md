@@ -42,4 +42,63 @@ $$T_{\text{exact}}(x,y) = T_{\max} \sin\left(\frac{\pi x}{L}\right) \frac{\sinh(
 | **4,900** | 9,522 | ~0.0570s | ~0.0165s | 0.31% |
 | **10,000** | 19,602 | ~0.1210s | ~0.0380s | **0.15%** |
 
-> **Validation Note:** The solver achieves monotonic $h$-refinement convergence, bringing relative $L_2$ error down to **0.15%** at $N \approx 10,000$ nodes while keeping combined assembly and solve execution times under **0.2
+> **Validation Note:** The solver achieves monotonic $h$-refinement convergence, bringing relative $L_2$ error down to **0.15%** at $N \approx 10,000$ nodes while keeping combined assembly and solve execution times under **0.2 seconds**.
+
+---
+
+## 📐 Mathematical Formulation
+
+### 1. Primary Field Equation
+Steady-state heat conduction governed by the 2D Laplace equation:
+$$-\nabla \cdot (k \nabla T) = Q$$
+
+### 2. Element Stiffness Matrix Assembly
+For isotropic thermal conductivity ($k_x, k_y$), the local element stiffness matrix $K^e$ is integrated as:
+$$K^e = \int_{\Omega^e} B^T D B \, d\Omega$$
+where $B$ is the strain-displacement matrix containing shape function derivatives ($\frac{\partial N_i}{\partial x}, \frac{\partial N_i}{\partial y}$), and $D = \begin{bmatrix} k_x & 0 \\ 0 & k_y \end{bmatrix}$.
+
+### 3. Boundary Conditions & Heat Flux Post-Processing
+* **Dirichlet BCs:** Prescribed nodal temperatures applied directly via identity row modification in the sparse global system.
+* **Heat Flux Vector Field:** Computed via Fourier's Law at element centroids:
+$$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ k_y \frac{\partial T}{\partial y} \end{bmatrix}$$
+
+---
+
+## ⚠️ Assumptions & Solver Limitations
+
+### 1. Physical & Material Assumptions
+* **Steady-State Thermal Behavior:** Assumes steady-state heat conduction ($\frac{\partial T}{\partial t} = 0$). Thermal mass, heat capacity ($c_p$), density ($\rho$), and transient temperature response are omitted.
+* **Isotropic/Orthotropic Material Properties:** Thermal conductivity coefficients ($k_x, k_y$) are assumed constant per element and temperature-independent ($k \neq f(T)$).
+* **No Internal Heat Generation ($Q = 0$):** Primary unstructured domain solves pure conduction without volumetric internal heat sources or sinks ($Q(x,y) = 0$).
+* **2D Planar Geometry:** Formulated for thin 2D plates operating under plane heat conduction with uniform unit thickness ($t = 1.0$).
+
+### 2. Boundary Condition Support
+* **Dirichlet BC Dominance:** Supports fixed nodal temperature boundary conditions ($T = T_0$).
+* **Insulated Boundary Default:** Unassigned outer boundaries default to zero heat flux ($\nabla T \cdot \mathbf{n} = 0$).
+* **No Convection or Radiation:** Natural/forced surface convection ($q = h(T - T_\infty)$) and radiative exchange ($q = \epsilon \sigma (T^4 - T_\infty^4)$) are not currently modeled.
+
+### 3. Numerical & Mathematical Formulations
+* **Linear Shape Functions (T3/Q4):** Constant Strain Triangles (T3) yield piecewise constant temperature gradients ($\nabla T$) and heat flux vectors ($\vec{q}$) within each element, causing step discontinuities across element edges prior to nodal averaging.
+* **Flux Accuracy:** Nodal temperature values ($T$) converge at $\mathcal{O}(h^2)$, while post-processed derivative fields ($\vec{q} = -k \nabla T$) converge at $\mathcal{O}(h)$ due to numerical differentiation.
+
+### 4. Computational & Scaling Limits
+* **In-Core Sparse Solver:** Direct matrix factorization (`scipy.sparse.linalg.spsolve`) uses $O(N^{1.5})$ memory in 2D, which is highly efficient for up to $\sim 10^5$ degrees of freedom but requires iterative solvers (e.g., Preconditioned Conjugate Gradient) for $10^6+$ node grids.
+* **Single-Threaded Execution:** Matrix assembly and linear system operations execute sequentially without multi-threading (OpenMP/MPI) or GPU acceleration.
+
+---
+
+## 📁 Repository Architecture
+
+```text
+fea-thermal-solver/
+├── src/
+│   ├── mesh.py                # Mesh class & meshio wrapper for file loading
+│   ├── element.py             # T3 & Q4 element stiffness matrix calculations (Ke)
+│   ├── assembly.py            # Global system assembly using scipy.sparse COO
+│   ├── boundary_conditions.py # Direct Dirichlet boundary condition application
+│   ├── solver.py              # Sparse linear system direct solver (SuperLU)
+│   └── postprocess.py         # Heat flux field computation, VTK exporter, 3D plotter
+├── main.py                    # Unified entry point (Benchmark execution + 3D FEA solve)
+├── plate_with_hole.msh        # Auto-generated Gmsh format mesh file (~10k nodes)
+├── solution.vtk               # VTK output file for ParaView inspection
+└── README.md                  # Detailed project documentation
