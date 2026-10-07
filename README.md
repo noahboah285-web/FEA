@@ -8,7 +8,7 @@ An end-to-end 2D Steady-State Thermal Finite Element Analysis (FEA) solver engin
 
 ---
 
-## 🏗️ Project Overview
+## Project Overview
 
 This application solves 2D steady-state heat conduction across complex geometries with stress risers and cutouts (such as plates with circular holes). Supporting meshes up to **10,000+ nodes** and **19,000+ elements**, the solver manages the complete scientific computing pipeline:
 
@@ -20,7 +20,7 @@ This application solves 2D steady-state heat conduction across complex geometrie
 
 ---
 
-## ✨ Key Features & Technical Highlights
+##Key Features & Technical Highlights
 
 * **Dual-Element Compatibility (T3 & Q4):** Supports both 3-node triangular (T3) and 4-node quadrilateral (Q4) isoparametric element formulations.
 * **Scalable Sparse Matrix Architecture:** Converts COO sparse matrices to CSR format prior to linear system solving, maintaining fast execution times even at high node counts.
