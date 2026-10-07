@@ -82,7 +82,7 @@ $$\vec{q} = -k \nabla T = -\begin{bmatrix} k_x \frac{\partial T}{\partial x} \\ 
 ### 2. Boundary Condition Support
 * **Dirichlet BC Dominance:** Supports fixed nodal temperature boundary conditions ($T = T_0$).
 * **Insulated Boundary Default:** Unassigned outer boundaries default to zero heat flux ($\nabla T \cdot \mathbf{n} = 0$).
-* **No Convection or Radiation:** Natural/forced surface convection ($q = h(T - T_{\infty})$) and radiative exchange ($q = \epsilon \sigma (T^4 - T_{\infty}^4)$) are not currently modeled.
+* **No Convection or Radiation:** Natural/forced surface convection and radiative exchange are not currently modeled.
 
 ### 3. Numerical & Mathematical Formulations
 * **Linear Shape Functions (T3/Q4):** Constant Strain Triangles (T3) yield piecewise constant temperature gradients ($\nabla T$) and heat flux vectors ($\vec{q}$) within each element, causing step discontinuities across element edges prior to nodal averaging.
