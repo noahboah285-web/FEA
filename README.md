@@ -1,9 +1,5 @@
 # 2D Unstructured Finite Element Thermal Solver (Python)
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![FEA Accuracy](https://img.shields.io/badge/L2%20Error-%3C1.5%25-brightgreen.svg)]()
-
 An end-to-end 2D Steady-State Thermal Finite Element Analysis (FEA) solver engineered in Python. The project features automated mesh generation, dual element formulation (T3/Q4), sparse global system assembly, interactive 3D thermal topography visualization, and a quantitative validation suite benchmarked against analytical Laplace solutions.
 
 ---
@@ -57,12 +53,12 @@ For isotropic thermal conductivity ($k_x, k_y$), the local element stiffness mat
 $$K^e = \int_{\Omega^e} B^T D B \, d\Omega$$
 
 where $B$ is the strain-displacement matrix containing shape function derivatives ($\frac{\partial N_i}{\partial x}, \frac{\partial N_i}{\partial y}$), and $D$ is the conductivity tensor:
-$$D = \begin{bmatrix} k_x & 0 \\ 0 & k_y \end{bmatrix}$$
+$$D = \left[\begin{array}{cc} k_x & 0 <br/> 0 & k_y \end{array}\right]$$
 
 ### 3. Boundary Conditions & Heat Flux Post-Processing
 * **Dirichlet BCs:** Prescribed nodal temperatures applied directly via identity row modification in the sparse global system.
 * **Heat Flux Vector Field:** Computed via Fourier's Law at element centroids:
-$$\vec{q} = -k \nabla T = \left[ -k_x \frac{\partial T}{\partial x}, \; -k_y \frac{\partial T}{\partial y} \right]^T$$
+$$\vec{q} = -k \nabla T = \left[\begin{array}{c} -k_x \frac{\partial T}{\partial x} <br/> -k_y \frac{\partial T}{\partial y} \end{array}\right]$$
 
 ---
 
@@ -86,21 +82,3 @@ $$\vec{q} = -k \nabla T = \left[ -k_x \frac{\partial T}{\partial x}, \; -k_y \fr
 ### 4. Computational & Scaling Limits
 * **In-Core Sparse Solver:** Direct matrix factorization (`scipy.sparse.linalg.spsolve`) uses $\mathcal{O}(N^{1.5})$ memory in 2D, which is highly efficient for up to $\sim 10^5$ degrees of freedom but requires iterative solvers (e.g., Preconditioned Conjugate Gradient) for $10^6+$ node grids.
 * **Single-Threaded Execution:** Matrix assembly and linear system operations execute sequentially without multi-threading (OpenMP/MPI) or GPU acceleration.
-
----
-
-## Repository Architecture
-
-```text
-fea-thermal-solver/
-├── src/
-│   ├── mesh.py                # Mesh class & meshio wrapper for file loading
-│   ├── element.py             # T3 & Q4 element stiffness matrix calculations (Ke)
-│   ├── assembly.py            # Global system assembly using scipy.sparse COO
-│   ├── boundary_conditions.py # Direct Dirichlet boundary condition application
-│   ├── solver.py              # Sparse linear system direct solver (SuperLU)
-│   └── postprocess.py         # Heat flux field computation, VTK exporter, 3D plotter
-├── main.py                    # Unified entry point (Benchmark execution + 3D FEA solve)
-├── plate_with_hole.msh        # Auto-generated Gmsh format mesh file (~10k nodes)
-├── solution.vtk               # VTK output file for ParaView inspection
-└── README.md                  # Detailed project documentation
