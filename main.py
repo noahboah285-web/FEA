@@ -31,7 +31,11 @@ def generate_sample_mesh(num_r=40, num_theta=180):
     points = []
     for r in radii:
         for theta in angles:
-            points.append([r * np.cos(theta), r * np.sin(theta)])
+            px, py = r * np.cos(theta), r * np.sin(theta)
+            # Keep ring points strictly inside the plate (|y| < 0.5), with a small
+            # margin so they don't create sliver triangles against the frame nodes.
+            if abs(py) < 0.5 - 0.01:
+                points.append([px, py])
             
     # 2. Boundary resolution along outer rectangular frame
     x_outer = np.linspace(-1.0, 1.0, 120)
